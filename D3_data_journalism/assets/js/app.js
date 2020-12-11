@@ -83,17 +83,9 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis) {
     return circlesGroup;
 }
 
-// function used for updating circles group with new tooltip
-function updateToolTip(chosenXAxis, circlesGroup) {
-
-    var label;
-
-    if (cho)
-}
-
 // retrieve/import data from the CSV file
-d3.csv("../data/data.csv").then(function(censusData) {
-    if (err) throw err;
+d3.csv("/assets/data/data.csv").then(function(censusData) {
+    //if (err) throw err;
 
     // create a function to parse the data
     censusData.forEach(function(data) {
@@ -127,6 +119,124 @@ d3.csv("../data/data.csv").then(function(censusData) {
 
     // append initial circles
     var circlesGroup = chartGroup.selectAll("circle")
+        .data(censusData)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xLinearScale(d[chosenXAxis]))
+        .attr("cy", d => yLinearScale(d[chosenYAxis]))
+        .attr("r", 10)
+        .classed("stateCircle", true);
+
+    // create group for two x-axis labels
+    var xlabelsGroup = chartGroup.append("g")
+        .attr("transform", `translate(${width / 2}, ${height + 20})`);
+
+    var povertyLabel = xlabelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 20)
+        .attr("value", "poverty") // value to grab for event listener
+        .classed("active", true)
+        .text("In Poverty (%)");
+
+    var ageLabel = xlabelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 40)
+        .attr("value", "age") // value to grab for event listener
+        .classed("inactive", true)
+        .text("Age (Median)");
+
+    // create group for two y-axix labels
+    var ylabelsGroup = chartGroup.append("g")
+        .attr("transform", `translate(${width +20}, ${height / 2})`);
+
+    var healthcareLabel = ylabelsGroup.append("text")
+        .attr("x", 20)
+        .attr("y", 0)
+        .attr("value", "healthcare")
+        .classed("active", true)
+        .text("Lacks Healthcare (%)");
+
+    var obesityLabel = ylabelsGroup.append("text")
+        .attr("x", 40)
+        .attr("y", 0)
+        .attr("value", "obesity")
+        .classed("inactive", true)
+        .text("Obese (%)");
+
+    // x axis labels event listener
+    xlabelsGroup.selectAll("text")
+        .on("click", function() {
+            // get value of selection
+            var value = d3.select(this).attr("value");
+            if (value !== chosenXAxis) {
+                // replaces chosenXAxis with value
+                chosenXAxis = value;
+                // functions here found above csv import
+                // updates x scale for new data
+                xLinearScale = xScale(censusData, chosenXAxis);
+                // updates x axis with transition
+                xAxis = renderXAxes(xLinearScale, xAxis);
+                // update circles with new x values
+                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+                // updates tooltips with new info
+
+                // changes classes to change bold text
+                if (chosenXAxis === "poverty") {
+                    povertyLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    ageLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                }
+                else {
+                    povertyLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    ageLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                }
+            }
+        });
+
+    // y axis labels event listener
+    ylabelsGroup.selectAll("text")
+        .on("click", function() {
+            // get value of selection
+            var value = d3.select(this).attr("value");
+            if (value !== chosenYAxis) {
+                // replaces chosenYAxis with value
+                chosenYAxis = value;
+                // functions here found above csv import
+                // updates y scale for new data
+                yLinearScale = yScale(censusData, chosenYAxis);
+                // updates y axis with transition
+                yAxis = renderYAxes(yLinearScale, yAxis);
+                // update circles with new y values
+                circlesGroup = renderCircles(circlesGroup, yLinearScale, chosenYAxis);
+                // updates tooltips with new info
+
+                // changes classes to change bold text
+                if (chosenYAxis === "healthcare") {
+                    healthcareLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    obesityLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                }
+                else {
+                    healthcareLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    obesityLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                }
+            }
+        });
+
 }).catch(function(error) {
     console.log(error);
 });
