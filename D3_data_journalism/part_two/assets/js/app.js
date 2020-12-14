@@ -22,7 +22,7 @@ var svg = d3
 
 // append an svg group
 var chartGroup = svg.append("g")
-    .attr("transform", `translage(${margin.left}, ${margin.top})`);
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // initial params
 var chosenXAxis = "poverty";
@@ -74,18 +74,28 @@ function renderYAxes(newYScale, yAxis) {
     return yAxis;
 }
 // function used for updating circles group with a transition to new circles
-function renderCircles(circlesGroup, newXScale, chosenXAxis) {
+function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
 
     circlesGroup.transition()
         .duration(1000)
         .attr("cx", d => newXScale(d[chosenXAxis]));
+        
+
+    return circlesGroup;
+}
+
+function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
+
+    circlesGroup.transition()
+        .duration(1000)
+        .attr("cy", d => newYScale(d[chosenYAxis]));
+        
 
     return circlesGroup;
 }
 
 // retrieve/import data from the CSV file
 d3.csv("/assets/data/data.csv").then(function(censusData) {
-    //if (err) throw err;
 
     // create a function to parse the data
     censusData.forEach(function(data) {
@@ -113,8 +123,8 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
 
     // append y axis
     var yAxis = chartGroup.append("g")
-        .classed("y-axis", true)
-        .attr("transform", `translate(${width}, 0)`)
+        //.classed("y-axis", true)
+        .attr("transform", `translate(20, 0)`)
         .call(leftAxis);
 
     // append initial circles
@@ -125,6 +135,10 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
         .attr("cx", d => xLinearScale(d[chosenXAxis]))
         .attr("cy", d => yLinearScale(d[chosenYAxis]))
         .attr("r", 10)
+        .attr("class", "stateText")
+        .text(function(d) {
+            return d.abbr;
+        })
         .classed("stateCircle", true);
 
     // create group for two x-axis labels
@@ -147,18 +161,20 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
 
     // create group for two y-axix labels
     var ylabelsGroup = chartGroup.append("g")
-        .attr("transform", `translate(${width +20}, ${height / 2})`);
+        .attr("transform", `translate(-50, ${height / 2})`);
 
     var healthcareLabel = ylabelsGroup.append("text")
-        .attr("x", 20)
-        .attr("y", 0)
+        .attr("transform", "rotate(-90)")
+        .attr("x", 0)
+        .attr("y", 40)
         .attr("value", "healthcare")
         .classed("active", true)
         .text("Lacks Healthcare (%)");
 
     var obesityLabel = ylabelsGroup.append("text")
-        .attr("x", 40)
-        .attr("y", 0)
+        .attr("transform", "rotate(-90)")
+        .attr("x", 0)
+        .attr("y", 20)
         .attr("value", "obesity")
         .classed("inactive", true)
         .text("Obese (%)");
@@ -177,7 +193,7 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
                 // updates x axis with transition
                 xAxis = renderXAxes(xLinearScale, xAxis);
                 // update circles with new x values
-                circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+                circlesGroup = renderXCircles(circlesGroup, xLinearScale, chosenXAxis);
                 // updates tooltips with new info
 
                 // changes classes to change bold text
@@ -214,7 +230,7 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
                 // updates y axis with transition
                 yAxis = renderYAxes(yLinearScale, yAxis);
                 // update circles with new y values
-                circlesGroup = renderCircles(circlesGroup, yLinearScale, chosenYAxis);
+                circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
                 // updates tooltips with new info
 
                 // changes classes to change bold text
