@@ -73,14 +73,14 @@ function renderYAxes(newYScale, yAxis) {
     
     return yAxis;
 }
-// function used for updating circles group with a transition to new circles
+
+// functions used for updating circles group with a transition to new circles
 function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
 
     circlesGroup.transition()
         .duration(1000)
         .attr("cx", d => newXScale(d[chosenXAxis]));
         
-
     return circlesGroup;
 }
 
@@ -90,8 +90,27 @@ function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
         .duration(1000)
         .attr("cy", d => newYScale(d[chosenYAxis]));
         
-
     return circlesGroup;
+}
+
+// functions used for updating circle labels (overlayGroup) with a transition
+// to new circle label positions
+function renderXOverlay(overlayGroup, newXScale, chosenXAxis) {
+
+    overlayGroup.transition()
+        .duration(1000)
+        .attr("x", d => newXScale(d[chosenXAxis]));
+        
+    return overlayGroup;
+}
+
+function renderYOverlay(overlayGroup, newYScale, chosenYAxis) {
+
+    overlayGroup.transition()
+        .duration(1000)
+        .attr("y", d => newYScale(d[chosenYAxis]));
+        
+    return overlayGroup;
 }
 
 // retrieve/import data from the CSV file
@@ -135,26 +154,34 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
         .attr("cx", d => xLinearScale(d[chosenXAxis]))
         .attr("cy", d => yLinearScale(d[chosenYAxis]))
         .attr("r", 10)
+        .classed("stateCircle", true);
+    
+    // append initial circle labels
+    var overlayGroup = chartGroup.selectAll(null)
+        .data(censusData)
+        .enter()
+        .append("text")
+        .attr("x", d => xLinearScale(d.poverty))
+        .attr("y", d => yLinearScale(d.healthcare)+2.5)
         .attr("class", "stateText")
         .text(function(d) {
             return d.abbr;
-        })
-        .classed("stateCircle", true);
-
+        });
+        
     // create group for two x-axis labels
     var xlabelsGroup = chartGroup.append("g")
         .attr("transform", `translate(${width / 2}, ${height + 20})`);
 
     var povertyLabel = xlabelsGroup.append("text")
         .attr("x", 0)
-        .attr("y", 20)
+        .attr("y", 15)
         .attr("value", "poverty") // value to grab for event listener
         .classed("active", true)
         .text("In Poverty (%)");
 
     var ageLabel = xlabelsGroup.append("text")
         .attr("x", 0)
-        .attr("y", 40)
+        .attr("y", 35)
         .attr("value", "age") // value to grab for event listener
         .classed("inactive", true)
         .text("Age (Median)");
@@ -194,6 +221,8 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
                 xAxis = renderXAxes(xLinearScale, xAxis);
                 // update circles with new x values
                 circlesGroup = renderXCircles(circlesGroup, xLinearScale, chosenXAxis);
+                // update circle labels with new x values
+                overlayGroup = renderXOverlay(overlayGroup, xLinearScale, chosenXAxis);
                 // updates tooltips with new info
 
                 // changes classes to change bold text
@@ -231,6 +260,8 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
                 yAxis = renderYAxes(yLinearScale, yAxis);
                 // update circles with new y values
                 circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
+                // update circle labels with new x values
+                overlayGroup = renderYOverlay(overlayGroup, yLinearScale, chosenYAxis);
                 // updates tooltips with new info
 
                 // changes classes to change bold text

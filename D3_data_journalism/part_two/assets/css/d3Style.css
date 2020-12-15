@@ -25,6 +25,7 @@
 
 /* font size dependent on radius, see app.js */
 .stateText {
+  translate: (0, 30);
   font-size: 7pt;
   font-family: sans-serif;
   fill: #fff;
