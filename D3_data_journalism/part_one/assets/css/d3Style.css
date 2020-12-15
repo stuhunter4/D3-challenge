@@ -23,10 +23,11 @@
   cursor: pointer;
 }
 
-/* font size dependent on radius, see app.js */
+/* font size dependent on radius, see app.js  */
 .stateText {
+  translate: (0, 20);
   font-family: sans-serif;
-  font-size: 6pt;
+  font-size: 7pt;
   fill: #fff;
   text-anchor: middle;
 }
@@ -58,6 +59,7 @@
   .stateText {
     display: none;
   }
+
 
   .aText {
     font-size: 14px;

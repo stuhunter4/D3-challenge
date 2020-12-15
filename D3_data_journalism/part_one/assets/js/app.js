@@ -2,7 +2,7 @@
 var svgWidth = 960;
 var svgHeight = 500;
 
-// define the chart's margins as an objectS
+// define the chart's margins as an object
 var margin = {
     top: 20,
     right: 40,
@@ -67,35 +67,16 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
         .attr("r", 10)
         .classed("stateCircle", true);
 
-    var overlayGroup = chartGroup.selectAll("text")
+    // create state abbreviation labels
+    var overlayGroup = chartGroup.selectAll(null)
         .data(censusData)
         .enter()
         .append("text")
         .attr("x", d => xLinearScale(d.poverty))
-        .attr("y", d => yLinearScale(d.healthcare))
+        .attr("y", d => yLinearScale(d.healthcare)+2.5)
         .attr("class", "stateText")
         .text(function(d) {
             return d.abbr;
-        });
-
-    // initialize tool tip
-    var toolTip = d3.tip()
-        .attr("class", "tooltip")
-        .offset([80, -60])
-        .html(function(d) {
-            return(`<strong>${d.state}</strong><br>In Poverty(%): ${d.poverty}<br>Lacks Healthcare(%): ${d.healthcare}`);
-        });
-    
-    // create tooltip in the chart
-    chartGroup.call(toolTip);
-
-    // create event listeners to diplay and hide the tooltip
-    circlesGroup.on("mouseover", function(data) {
-        toolTip.show(data, this);
-    })
-        // onmouseout event
-        .on("mouseout", function(data) {
-            toolTip.hide(data);
         });
 
     // create axes labels
