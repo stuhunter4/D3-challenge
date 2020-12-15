@@ -108,9 +108,50 @@ function renderYOverlay(overlayGroup, newYScale, chosenYAxis) {
 
     overlayGroup.transition()
         .duration(1000)
-        .attr("y", d => newYScale(d[chosenYAxis]));
+        .attr("y", d => newYScale(d[chosenYAxis]))
+        .attr("transform", `translate(0, 2)`);
         
     return overlayGroup;
+}
+
+// functions used for updating circles group with new tooltip
+function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
+
+    var x_label;
+    var y_label;
+
+    if (chosenXAxis === "poverty") {
+        x_label = "In Poverty(%):";
+    }
+    else {
+        x_label = "Age(Median):";
+    }
+     
+    if (chosenYAxis === "healthcare") {
+        y_label = "Lacks Healthcare(%):";
+    }
+    else {
+        y_label = "Obese(%):";
+    }
+
+    var toolTip = d3.tip()
+        .attr("class", "tooltip")
+        .offset([80, -60])
+        .html(function(d) {
+            return (`<strong>${d.state}</strong><br>${x_label} ${d[chosenXAxis]}<br>${y_label} ${d[chosenYAxis]}`);
+        });
+    
+    circlesGroup.call(toolTip);
+
+    circlesGroup.on("mouseover", function(data) {
+        toolTip.show(data, this);
+    })
+        // onmouseout event
+        .on("mouseout", function(data) {
+            toolTip.hide(data);
+        });
+
+    return circlesGroup;
 }
 
 // retrieve/import data from the CSV file
@@ -142,7 +183,7 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
 
     // append y axis
     var yAxis = chartGroup.append("g")
-        //.classed("y-axis", true)
+        .classed("y-axis", true)
         .attr("transform", `translate(20, 0)`)
         .call(leftAxis);
 
@@ -156,7 +197,7 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
         .attr("r", 10)
         .classed("stateCircle", true);
     
-    // append initial circle labels
+    // append initial circle labels (text overlay)
     var overlayGroup = chartGroup.selectAll(null)
         .data(censusData)
         .enter()
@@ -206,6 +247,9 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
         .classed("inactive", true)
         .text("Obese (%)");
 
+    // updateToolTip functions above csv import
+    var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+
     // x axis labels event listener
     xlabelsGroup.selectAll("text")
         .on("click", function() {
@@ -224,6 +268,7 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
                 // update circle labels with new x values
                 overlayGroup = renderXOverlay(overlayGroup, xLinearScale, chosenXAxis);
                 // updates tooltips with new info
+                circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
                 // changes classes to change bold text
                 if (chosenXAxis === "poverty") {
@@ -263,6 +308,7 @@ d3.csv("/assets/data/data.csv").then(function(censusData) {
                 // update circle labels with new x values
                 overlayGroup = renderYOverlay(overlayGroup, yLinearScale, chosenYAxis);
                 // updates tooltips with new info
+                circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
                 // changes classes to change bold text
                 if (chosenYAxis === "healthcare") {

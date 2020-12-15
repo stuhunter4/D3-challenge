@@ -26,10 +26,15 @@
 /* font size dependent on radius, see app.js */
 .stateText {
   translate: (0, 30);
+  user-select: none;
   font-size: 7pt;
   font-family: sans-serif;
   fill: #fff;
   text-anchor: middle;
+}
+
+.stateText:hover {
+  display: none;
 }
 
 .stateCircle {
@@ -42,7 +47,7 @@
   margin: 0;
 }
 
-.d3-tip {
+.tooltip {
   padding: 6px;
   font-size: 12px;
   line-height: 1;
