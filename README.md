@@ -1,3 +1,3 @@
 ## Data Journalism and D3
-<img src="https://github.com/stuhunter4/D3-challenge/blob/main/D3_data_journalism/Bonus/assets/data/bonus_gif.GIF" alt="bonusGIF">
+<img src="https://github.com/stuhunter4/D3-challenge/blob/main/D3_data_journalism/Bonus/assets/data/bonus_gif.gif" alt="bonusGIF">
 <p>Data visualization examining health risks facing particular demographics, utilizing information from the U.S. Census Bureau and the Behavioral Risk Factor Surveillance System; namely a data set based on 2014 ACS 1-year estimates.  This data set includes data on rates of income, obesity, poverty, etc. by state.  The core task here is to create a "D3 Dabbler": a scatter plot that represents each state with  abberviations inside circle elements.  This graphic is coded in the app.js file, pulling data from data.csv using the d3.csv function.</p>
